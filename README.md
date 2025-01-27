@@ -38,7 +38,7 @@
    ```
 2. Перейдите в каталог cafeorders
    ```bash
-   cd cafeorders
+   cd CafeOrders
    ```
 3. Создайте виртуальное окружение и активируйте его:
    ```bash
