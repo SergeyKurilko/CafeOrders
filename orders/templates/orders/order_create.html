@@ -1,0 +1,46 @@
+{% extends 'orders/base.html' %}
+
+{% block title %}Создание заказа{% endblock %}
+
+{% block content %}
+
+<div class="container mt-5">
+    <h3>Создание нового заказа.</h3>
+    <form action="#" method="post">
+        {% csrf_token %}
+        <!-- Поле для номера стола -->
+        <div class="mb-3">
+            <label for="{{ form.table_number.id_for_label }}" class="form-label">Номер стола</label>
+            {{ form.table_number }}
+            {% if form.table_number.errors %}
+                <div class="alert alert-danger mt-2">
+                    {{ form.table_number.errors }}
+                </div>
+            {% endif %}
+        </div>
+
+        <!-- Поле для выбора блюд -->
+        <div class="mb-3">
+            <label class="form-label">Выберите блюда:</label>
+            <div>
+                {% for item in form.items %}
+                    <div class="form-check">
+                        {{ item.tag }}
+                        <label class="form-check-label" for="{{ item.id_for_label }}">
+                            {{ item.choice_label }}
+                        </label>
+                    </div>
+                {% endfor %}
+            </div>
+            {% if form.items.errors %}
+                <div class="alert alert-danger mt-2">
+                    {{ form.items.errors }}
+                </div>
+            {% endif %}
+        </div>
+
+        <button type="submit" class="btn btn-success">Создать заказ</button>
+    </form>
+</div>
+
+{% endblock %}

@@ -1,0 +1,95 @@
+{% extends 'orders/base.html' %}
+{% load static %}
+
+{% block title %}
+{% if status %}
+Заказы со статусом "{{ status }}"
+{% else %}
+Все заказы
+{% endif %}
+{% endblock %}
+
+{% block content %}
+
+
+<div class="container pt-3 pb-5">
+    {% if status %}
+    <h3>Заказы со статусом "{{ status }}"</h3>
+    {% else %}
+    <h3>Все заказы</h3>
+    {% endif %}
+
+    {% for order in orders %}
+    <div class="card order-list-card mt-4">
+        <div class="card-header">
+          Заказ ID: {{ order.id }}
+        </div>
+        <div class="card-body">
+          <h5 class="card-title"> 
+            <span class="text-muted">
+                Статус заказа:
+            </span> 
+            <span class="order-status-{{ order.status }}">
+            {{ order.get_status_display }}
+            </span>
+          </h5>
+          <h5 class="card-title">
+            <span class="text-muted">
+                Номер стола:
+            </span> 
+            {{ order.table_number }}
+          </h5>
+          <h5 class="card-title">
+            <span class="text-muted">
+                Общая стоимость: 
+            </span> 
+            <b>{{ order.total_price|floatformat:0 }} ₽</b>
+          </h5>
+          <h5 class="card-title">
+            <hr class="hr" />
+            <span class="text-muted">
+                Список блюд:
+            </span> 
+          </h5>
+
+          <!-- Items list -->
+          <table class="table">
+            <thead>
+              <tr>
+                <th scope="col">#</th>
+                <th scope="col">Название</th>
+                <th scope="col">Стоимость</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for item in order.items.all %}
+              <tr>
+                <th scope="row">{{ forloop.counter }}</th>
+                <td>{{ item.name }}</td>
+                <td>{{ item.price }}</td>
+              </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+          <!-- /Items list -->
+
+          <a href="{{ order.get_absolute_url }}" class="btn btn-primary">Открыть</a>
+        </div>
+      </div>
+
+    {% empty %}
+    {% if not status %}
+    <div class="container text-center">
+      <h4>Тут пока нет заказов.</h4>
+      <a href="{% url 'orders:create_order' %}" class="btn btn-warning">Создать первый заказ</a>
+    </div>
+    {% endif %}
+    {% endfor %}
+</div>
+
+{% endblock %}
+
+
+{% block custom_js %}
+<script src="{% static 'orders/js/homepage_script.js' %}"></script>
+{% endblock %}

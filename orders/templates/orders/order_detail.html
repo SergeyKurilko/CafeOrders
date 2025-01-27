@@ -1,0 +1,122 @@
+{% extends 'orders/base.html' %}
+{% load static %}
+
+{% block title %}
+Заказ №{{ order.id }}
+{% endblock %}
+
+{% block content %}
+
+<div class="container pt-3 pb-5">
+    <h4 class="text-center">Информация о заказе №{{ order.id }}</h4>
+    <div class="card order-list-card mt-4">
+        <div class="card-header">
+          Заказ ID: {{ order.id }}
+        </div>
+        <div class="card-body">
+          <div class="">
+            <div class="card-title d-flex flex-row align-items-end"> 
+              <span class="text-muted">
+                  <h5>Статус заказа:</h5>
+              </span> 
+              <span class="actual-order-status order-status-{{ order.status }} ms-2">
+              <h5> {{ order.get_status_display }}</h5>
+              </span> 
+              <select id="changeOrderStatusSelects" class="form-select d-none w-25 ms-2" aria-label="Default select example">
+                <option class="order-status-option" value="pending">В ожидании</option>
+                <option class="order-status-option" value="ready">Готово</option>
+                <option class="order-search-option" value="paid">Оплачено</option>
+              </select>
+              <form id="changeOrderStatusForm" action="{{ url_for_change_order_status }}" data-csrf_token="{{ csrf_token }}" method="post">
+                <input id="newOrderStatusInput" type="hidden" name="new_status">
+                <button id="confirmChangeOrderStatusButton" class="btn btn-success d-none ms-2" type="submit">Сохранить</button>
+                <button id="cancelChangeOrderStatusButton" class="btn btn-warning d-none ms-2" type="">Отменить</button>
+              </form>
+              <div class="mb-2"><a href="" id="changeOrderStatusButton" class="ms-2">Изменить статус</a></div>
+            </div>
+          </div>
+
+          <h5 class="card-title">
+            <span class="text-muted">
+                Номер стола:
+            </span> 
+            {{ order.table_number }}
+          </h5>
+          <h5 class="card-title">
+            <span class="text-muted">
+                Общая стоимость: 
+            </span> 
+            <b>{{ order.total_price|floatformat:0 }} ₽</b>
+          </h5>
+          <h5 class="card-title">
+            <hr class="hr" />
+            <span class="text-muted">
+                Список блюд:
+            </span> 
+          </h5>
+
+          <!-- Items list -->
+          <table class="table">
+            <thead>
+              <tr>
+                <th scope="col">#</th>
+                <th scope="col">Название</th>
+                <th scope="col">Стоимость</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for item in order.items.all %}
+              <tr>
+                <th scope="row">{{ forloop.counter }}</th>
+                <td>{{ item.name }}</td>
+                <td>{{ item.price|floatformat:'0' }} ₽</td>
+              </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+          <!-- /Items list -->
+
+          <button id="openModalForDeleteButton" class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#confirmDeleteOrderModal">Удалить заказ</button>
+        </div>
+      </div>
+
+    <!-- Modal -->
+    <div class="modal fade" id="confirmDeleteOrderModal" tabindex="-1" aria-labelledby="confirmDeleteOrderModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+            <h5 class="modal-title" id="confirmDeleteOrderModalLabel">Подтверждение удаления закза</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                Вы точно хотите удалить заказ №{{ order.id }}? При нажатии на кнопку "Да" заказ и вся информация о нем будут удалены!
+            </div>
+            <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Закрыть</button>
+            <button id="deleteOrderConfirmButton" 
+                    type="button" 
+                    data-del_order_url="{% url 'orders:delete_order' order.pk %}" 
+                    data-csrf="{{ csrf_token }}" 
+                    data-url_redirect_after_delete="{% url 'orders:orders_list' %}"
+                    class="btn btn-danger">
+                    Да
+            </button>
+            </div>
+        </div>
+        </div>
+    </div>
+
+    <a href="{% url 'orders:orders_list' %}" class="btn btn-primary mt-3">
+        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-arrow-left" viewBox="0 0 16 16">
+        <path fill-rule="evenodd" d="M15 8a.5.5 0 0 0-.5-.5H2.707l3.147-3.146a.5.5 0 1 0-.708-.708l-4 4a.5.5 0 0 0 0 .708l4 4a.5.5 0 0 0 .708-.708L2.707 8.5H14.5A.5.5 0 0 0 15 8"/>
+        </svg>
+         К списку заказов
+    </a>
+
+</div>
+
+{% endblock %}
+
+{% block custom_js %}
+<script src="{% static 'orders/js/order_detail_script.js' %}"></script>
+{% endblock %}
