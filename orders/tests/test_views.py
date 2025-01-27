@@ -334,14 +334,6 @@ class SearchOrderViewTest(BaseOrderViewTest):
             "some_parameter": "55"
         }
 
-
-        # request = self.factory.get(
-        #     path=self.search_url,
-        #     query_params=params,
-        # )
-        #
-        # response = SearchOrderView.as_view()(request)
-
         response = self._request_response(params)
 
         response_content = json.loads(response.content)
